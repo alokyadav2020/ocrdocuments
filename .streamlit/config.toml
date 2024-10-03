@@ -1,5 +1,4 @@
 
-
 [browser]
 gatherUsageStats = false
 
@@ -7,7 +6,6 @@ gatherUsageStats = false
 enableCORS = false
 
 [theme]
-base = "dark"  # optional, if you want to keep dark mode
+base = "dark"  
 
-# Hide the Streamlit branding footer and menu
 hideToolbar = true
