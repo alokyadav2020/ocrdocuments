@@ -34,7 +34,13 @@ def delete_existing_files(folder):
 
 # Streamlit file upload component
 
-st.set_page_config(page_title="OCR",layout="wide")
+st.set_page_config(page_title="OCR",
+                   layout="wide",
+                   initial_sidebar_state='collapsed',
+                   menu_items=
+                   {'Get Help': 'alokranjan.ucer@gmail.com',
+                    'Report a bug': "alokranjan.ucer@gmail.com",
+                     'About': "THis app is demo purpose for performing OCR"})
 uploaded_file = st.file_uploader("Choose an image...", type=["jpeg"])
 
 if uploaded_file is not None:

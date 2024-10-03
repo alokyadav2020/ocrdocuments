@@ -1,9 +1,4 @@
 
-[browser]
-gatherUsageStats = false
-
-[server]
-enableCORS = false
 
 [theme]
 base = "dark"  
