@@ -33,8 +33,8 @@ def delete_existing_files(folder):
             st.error(f"Error deleting file {file_path}: {e}")
 
 # Streamlit file upload component
-st.title("OCR")
-st.set_page_config(layout="wide")
+
+st.set_page_config(page_title="OCR",layout="wide")
 uploaded_file = st.file_uploader("Choose an image...", type=["jpeg"])
 
 if uploaded_file is not None:
