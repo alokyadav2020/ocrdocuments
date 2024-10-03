@@ -7,6 +7,10 @@ from google.oauth2 import service_account
 
 # Load the .env file
 load_dotenv()
+st.set_page_config(page_title="OCR",
+                   layout="wide",
+                   initial_sidebar_state='collapsed',
+                   )
 hide_streamlit_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -41,10 +45,7 @@ def delete_existing_files(folder):
 
 # Streamlit file upload component
 
-st.set_page_config(page_title="OCR",
-                   layout="wide",
-                   initial_sidebar_state='collapsed',
-                   )
+
 uploaded_file = st.file_uploader("Choose an image...", type=["jpeg"])
 
 if uploaded_file is not None:
