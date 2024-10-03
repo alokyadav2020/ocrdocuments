@@ -8,4 +8,6 @@ enableCORS = false
 [theme]
 base = "dark"  
 
-hideToolbar = true
+[ui]
+hide_menu = true
+hide_footer = true
