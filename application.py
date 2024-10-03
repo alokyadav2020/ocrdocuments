@@ -33,6 +33,8 @@ def delete_existing_files(folder):
             st.error(f"Error deleting file {file_path}: {e}")
 
 # Streamlit file upload component
+st.title("OCR")
+st.set_page_config(layout="wide")
 uploaded_file = st.file_uploader("Choose an image...", type=["jpeg"])
 
 if uploaded_file is not None:
@@ -50,17 +52,17 @@ if uploaded_file is not None:
         f.write(uploaded_file.getbuffer())
 
 
-    # col1, col2 = st.columns([2,2])    
+    col1, col2 = st.columns([2,2])    
 
     result = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials) 
-    st.write(result)
+    # st.write(result)
 
 
-    # with col1:
-    #  st.image(save_path, caption="Uploaded Image", use_column_width=True)
+    with col1:
+     st.image(save_path, caption="Uploaded Image", use_column_width=True)
 
-    # with col2:
-    #  st.write(result)
+    with col2:
+     st.write(result)
     
     # Confirmation message
     # st.success(f"File saved as {unique_filename}")
