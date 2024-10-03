@@ -1,0 +1,5 @@
+streamlit
+google-cloud-storage
+google-cloud-documentai
+google-api-core
+python-dotenv
