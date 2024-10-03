@@ -7,6 +7,13 @@ from google.oauth2 import service_account
 
 # Load the .env file
 load_dotenv()
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
 PROJECT_ID = os.getenv('PROJECT_ID')
