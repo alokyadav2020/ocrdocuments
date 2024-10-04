@@ -2,8 +2,10 @@ import streamlit as st
 import os
 import uuid
 from src.documentsai import ocr_doc
+from src.anthropic import get_base64_encoded_image,ocr_anthropic
 from dotenv import load_dotenv
 from google.oauth2 import service_account
+from PIL import Image
 
 # Load the .env file
 load_dotenv()
@@ -23,6 +25,7 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 PROJECT_ID = os.getenv('PROJECT_ID')
 LOCATION =  os.getenv('LOCATION')  
 PROCESSOR_ID = os.getenv('PROCESSOR_ID') 
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
 credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
 
 
@@ -43,37 +46,52 @@ def delete_existing_files(folder):
         except Exception as e:
             st.error(f"Error deleting file {file_path}: {e}")
 
-# Streamlit file upload component
 
+      
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpeg"])
+uploaded_file = st.file_uploader("Choose an image...", type=["jpeg","png"])
 
 if uploaded_file is not None:
-    # Delete any existing file before saving the new one
     delete_existing_files(UPLOAD_FOLDER)
-    
-    # Generate a unique filename
-    unique_filename = str(uuid.uuid4()) + "_" + uploaded_file.name
-    
-    # Define the save path
+    unique_filename = str(uuid.uuid4()) + "." + "png"
     save_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-    
-    # Save the file in the folder
-    with open(save_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+    model = st.selectbox(label="Select Model", options= ['Select','Document_AI','Anthropic'])
 
+    jpeg_image = Image.open(uploaded_file)
 
-    col1, col2 = st.columns([2,2])    
+# Save the image in PNG format
+    jpeg_image.save(save_path)
+    # with open(save_path, "wb") as f:
+    #    f.write(uploaded_file.getbuffer())
+    col1, col2 = st.columns([1,1])  
+    with col1:
+          st.image(save_path, caption="Uploaded Image", use_column_width=True)
 
-    result = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials) 
+    with col2:
+              
+
+        if model == 'Select':
+            ""
+        elif model == "Document_AI":
+            result = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
+            st.write(result)
+
+        elif model == 'Anthropic':
+                
+                basestring = get_base64_encoded_image(save_path)
+                result = ocr_anthropic(image_strin=basestring,api_key=ANTHROPIC_API_KEY)
+                st.write(result)
+            
+      
+
+        
+      
+   
+   
     # st.write(result)
 
 
-    with col1:
-     st.image(save_path, caption="Uploaded Image", use_column_width=True)
-
-    with col2:
-     st.write(result)
+    
     
     # Confirmation message
     # st.success(f"File saved as {unique_filename}")

@@ -1,5 +1,7 @@
 from google.api_core.client_options import ClientOptions
 from google.cloud import documentai
+import base64
+from anthropic import Anthropic
 
 from pathlib import Path
 
