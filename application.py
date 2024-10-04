@@ -28,6 +28,8 @@ LOCATION =  os.getenv('LOCATION')
 PROCESSOR_ID = os.getenv('PROCESSOR_ID') 
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
 OPEN_AI_KEY = os.getenv('OPEN_AI_KEY')
+USER = os.getenv('USER')
+PASSWORD = os.getenv('PASSWORD')
 credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
 
 
@@ -49,48 +51,71 @@ def delete_existing_files(folder):
             st.error(f"Error deleting file {file_path}: {e}")
 
 
+# USER_CREDENTIALS = {"user": "admin", "admin": "admin"}
+
+def login_page():
+    st.title("Login Page")
+    # Create login input fields
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    # Login button
+    if st.button("Login"):
+        # Check if the credentials match
+        if PASSWORD == password and USER == username:
+            st.session_state['logged_in'] = True
+            st.session_state['username'] = username
+            st.rerun()
+            # st.experimental_user()  # Refresh the page to move to the home page
+        else:
+            st.error("Invalid username or password")
+
       
+def home_page():
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpeg","png"])
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpeg","png"])
+    if uploaded_file is not None:
+        delete_existing_files(UPLOAD_FOLDER)
+        unique_filename = str(uuid.uuid4()) + "." + "png"
+        save_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+        model = st.selectbox(label="Select Model", options= ['Select','Document_AI','Anthropic','OpenAI'])
 
-if uploaded_file is not None:
-    delete_existing_files(UPLOAD_FOLDER)
-    unique_filename = str(uuid.uuid4()) + "." + "png"
-    save_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-    model = st.selectbox(label="Select Model", options= ['Select','Document_AI','Anthropic','OpenAI'])
+        jpeg_image = Image.open(uploaded_file)
 
-    jpeg_image = Image.open(uploaded_file)
+    # Save the image in PNG format
+        jpeg_image.save(save_path)
+        # with open(save_path, "wb") as f:
+        #    f.write(uploaded_file.getbuffer())
+        col1, col2 = st.columns([1,1])  
+        with col1:
+            st.image(save_path, caption="Uploaded Image", use_column_width=True)
 
-# Save the image in PNG format
-    jpeg_image.save(save_path)
-    # with open(save_path, "wb") as f:
-    #    f.write(uploaded_file.getbuffer())
-    col1, col2 = st.columns([1,1])  
-    with col1:
-          st.image(save_path, caption="Uploaded Image", use_column_width=True)
-
-    with col2:
-              
-
-        if model == 'Select':
-            ""
-        elif model == "Document_AI":
-            result = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
-            st.write(result)
-
-        elif model == 'Anthropic':
+        with col2:
                 
-                basestring = get_base64_encoded_image(save_path)
-                result = ocr_anthropic(image_strin=basestring,api_key=ANTHROPIC_API_KEY)
+
+            if model == 'Select':
+                ""
+            elif model == "Document_AI":
+                result = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
                 st.write(result)
 
-        elif model == 'OpenAI':
-              base64_img = f"data:image/png;base64,{encode_image(save_path)}"  
-              result = openai_ocr(base64_img=base64_img,api_key=OPEN_AI_KEY)      
-              st.write(result)
-            
-      
+            elif model == 'Anthropic':
+                    
+                    basestring = get_base64_encoded_image(save_path)
+                    result = ocr_anthropic(image_strin=basestring,api_key=ANTHROPIC_API_KEY)
+                    st.write(result)
 
+            elif model == 'OpenAI':
+                base64_img = f"data:image/png;base64,{encode_image(save_path)}"  
+                result = openai_ocr(base64_img=base64_img,api_key=OPEN_AI_KEY)      
+                st.write(result)
+                
+      
+    if st.button("Logout"):
+        st.session_state['logged_in'] = False
+        # st.experimental_user()
+        st.rerun()
+        
         
       
    
@@ -105,3 +130,8 @@ if uploaded_file is not None:
     
     # # Display the uploaded image
     # st.image(save_path, caption="Uploaded Image", use_column_width=True)
+
+if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
+    login_page()  # Show the login page if not logged in
+else:
+    home_page()    
