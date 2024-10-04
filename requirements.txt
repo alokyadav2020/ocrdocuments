@@ -4,3 +4,4 @@ google-cloud-documentai
 google-api-core
 python-dotenv
 anthropic
+openai

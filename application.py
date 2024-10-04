@@ -3,6 +3,7 @@ import os
 import uuid
 from src.documentsai import ocr_doc
 from src.anthropic import get_base64_encoded_image,ocr_anthropic
+from src.openai import encode_image,openai_ocr
 from dotenv import load_dotenv
 from google.oauth2 import service_account
 from PIL import Image
@@ -26,6 +27,7 @@ PROJECT_ID = os.getenv('PROJECT_ID')
 LOCATION =  os.getenv('LOCATION')  
 PROCESSOR_ID = os.getenv('PROCESSOR_ID') 
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+OPEN_AI_KEY = os.getenv('OPEN_AI_KEY')
 credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
 
 
@@ -55,7 +57,7 @@ if uploaded_file is not None:
     delete_existing_files(UPLOAD_FOLDER)
     unique_filename = str(uuid.uuid4()) + "." + "png"
     save_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-    model = st.selectbox(label="Select Model", options= ['Select','Document_AI','Anthropic'])
+    model = st.selectbox(label="Select Model", options= ['Select','Document_AI','Anthropic','OpenAI'])
 
     jpeg_image = Image.open(uploaded_file)
 
@@ -81,6 +83,11 @@ if uploaded_file is not None:
                 basestring = get_base64_encoded_image(save_path)
                 result = ocr_anthropic(image_strin=basestring,api_key=ANTHROPIC_API_KEY)
                 st.write(result)
+
+        elif model == 'OpenAI':
+              base64_img = f"data:image/png;base64,{encode_image(save_path)}"  
+              result = openai_ocr(base64_img=base64_img,api_key=OPEN_AI_KEY)      
+              st.write(result)
             
       
 
