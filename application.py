@@ -96,8 +96,9 @@ def home_page():
             if model == 'Select':
                 ""
             elif model == "Document_AI":
-                st.write("##################################################################################")
                 result,confidence = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
+                st.write("##################################################################################")
+                
                 st.write(f"Accuracy : {confidence:.2f} %")
                 st.write("##################################################################################")
 
