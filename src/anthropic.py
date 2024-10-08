@@ -37,7 +37,7 @@ def ocr_anthropic(image_strin:base64,api_key,prompt:str,MODEL_NAME:str):
     )
     
     total_tokens = response.usage.input_tokens + response.usage.output_tokens
-    return (response.content[0].text , total_tokens)
+    return response.content[0].text , total_tokens
    
 
 
