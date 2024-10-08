@@ -97,9 +97,10 @@ def home_page():
                 ""
             elif model == "Document_AI":
                 result,confidence = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
+                st.write("Document AI, (By Google).")
                 st.write("-"*80)
                 
-                st.write(f"Accuracy : {confidence:.2f} %")
+                st.write(f"Confidence : {confidence:.2f} %")
 
                 st.write("-"*80)
 
