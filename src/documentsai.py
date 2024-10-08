@@ -37,7 +37,7 @@ def ocr_doc(PROJECT_ID:str,LOCATION:str,PROCESSOR_ID:str,FILE_PATH:Path,credenti
         result = docai_client.process_document(request=request)
 
         document_object = result.document
-        return document_object.text
+        return remove_first_line_if_number(document_object.text), document_object.pages[0].layout.confidence*100
         # print("Document processing complete.")
         # print(f"Text: {document_object.text}")
                 
@@ -45,5 +45,15 @@ def ocr_doc(PROJECT_ID:str,LOCATION:str,PROCESSOR_ID:str,FILE_PATH:Path,credenti
     except Exception as e:
        raise e
        
+
+def remove_first_line_if_number(text):
+    lines = text.split('\n')
+    
+    # Check if the first line contains only digits
+    if lines[0].strip().isdigit():
+        lines = lines[1:]  # Remove the first line
+    
+    return '\n'.join(lines)
+
 
 #

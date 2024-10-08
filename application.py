@@ -51,7 +51,7 @@ def delete_existing_files(folder):
             st.error(f"Error deleting file {file_path}: {e}")
 
 
-# USER_CREDENTIALS = {"user": "admin", "admin": "admin"}
+
 
 def login_page():
     st.title("Login Page")
@@ -96,7 +96,11 @@ def home_page():
             if model == 'Select':
                 ""
             elif model == "Document_AI":
-                result = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
+                st.write("##################################################################################")
+                result,confidence = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
+                st.write(f"Accuracy : {confidence:.2f} %")
+                st.write("##################################################################################")
+
                 st.write(result)
 
             elif model == 'Anthropic':
