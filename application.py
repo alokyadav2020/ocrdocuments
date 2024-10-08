@@ -97,24 +97,42 @@ def home_page():
                 ""
             elif model == "Document_AI":
                 result,confidence = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
-                st.write("##################################################################################")
+                st.write("-"*80)
                 
                 st.write(f"Accuracy : {confidence:.2f} %")
-                st.write("##################################################################################")
+
+                st.write("-"*80)
 
                 st.write(result)
 
             elif model == 'Anthropic':
-                    
-                    basestring = get_base64_encoded_image(save_path)
-                    result = ocr_anthropic(image_strin=basestring,api_key=ANTHROPIC_API_KEY)
-                    st.write(result)
+                    antropic_model_name = st.selectbox(label='Select Anthropic model',options=['claude-3-5-sonnet-20240620','claude-3-opus-20240229'])
+
+                    promt_txt = st.text_input(label="Default Prompt : Transcribe this text. Only output the text and nothing else.",
+                                              value="",
+                                              placeholder="Please write custom prompt here.")
+                    if promt_txt:
+                        
+                        basestring = get_base64_encoded_image(save_path)
+                        result, total_tokanes = ocr_anthropic(image_strin=basestring,api_key=ANTHROPIC_API_KEY,prompt=promt_txt,MODEL_NAME=antropic_model_name)
+                        st.write("-"*80)
+                        st.write(f"Total tokens : {total_tokanes}")
+                        st.write("-"*80)                       
+                        st.write(result)
 
             elif model == 'OpenAI':
-                base64_img = f"data:image/png;base64,{encode_image(save_path)}"  
-                result = openai_ocr(base64_img=base64_img,api_key=OPEN_AI_KEY)      
-                st.write(result)
-                
+                promt_txt_openai = st.text_input(label="Default Prompt : Transcribe this text. Only output the text and nothing else.",
+                                              value="",
+                                              placeholder="Please write custom prompt here.")
+                if promt_txt_openai:
+
+                    base64_img = f"data:image/png;base64,{encode_image(save_path)}"  
+                    result,ttl_tokaen = openai_ocr(base64_img=base64_img,api_key=OPEN_AI_KEY)      
+                    st.write("-"*80)
+                    st.write(f"Total tokens : {ttl_tokaen}")
+                    st.write("-"*80)                       
+                    st.write(result)
+                    
       
     if st.button("Logout"):
         st.session_state['logged_in'] = False

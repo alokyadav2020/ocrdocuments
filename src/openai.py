@@ -36,4 +36,7 @@ def openai_ocr(base64_img,api_key):
         max_tokens=3000,
     )
 
-    return response.choices[0].message.content
+    txt_respone = response.choices[0].message.content
+    total_token = response.usage.total_tokens
+
+    return (txt_respone,total_token)

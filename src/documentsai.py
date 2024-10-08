@@ -37,7 +37,8 @@ def ocr_doc(PROJECT_ID:str,LOCATION:str,PROCESSOR_ID:str,FILE_PATH:Path,credenti
         result = docai_client.process_document(request=request)
 
         document_object = result.document
-        return remove_first_line_if_number(document_object.text), document_object.pages[0].layout.confidence*100
+        accuracy= (result.document.pages[0].layout.confidence)*100
+        return (remove_first_line_if_number(document_object.text), accuracy)
         # print("Document processing complete.")
         # print(f"Text: {document_object.text}")
                 
