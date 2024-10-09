@@ -13,12 +13,12 @@ def encode_image(image_path):
 
 
 
-def openai_ocr(base64_img,api_key):
+def openai_ocr(base64_img,api_key,models):
     client = OpenAI(api_key=api_key) #Best practice needs OPENAI_API_KEY environment variable
 # client = OpenAI('OpenAI API Key here')
 
     response = client.chat.completions.create(
-        model='gpt-4o',
+        model=models,
         messages=[
             {
                 "role": "user",

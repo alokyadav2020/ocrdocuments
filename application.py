@@ -72,67 +72,75 @@ def login_page():
 
       
 def home_page():
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
     uploaded_file = st.file_uploader("Choose an image...", type=["jpeg","png"])
 
     if uploaded_file is not None:
-        delete_existing_files(UPLOAD_FOLDER)
-        unique_filename = str(uuid.uuid4()) + "." + "png"
-        save_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-        model = st.selectbox(label="Select Model", options= ['Select','Document_AI','Anthropic','OpenAI'])
+        file_size = uploaded_file.size
+        if file_size < MAX_FILE_SIZE:
 
-        jpeg_image = Image.open(uploaded_file)
+            delete_existing_files(UPLOAD_FOLDER)
+            unique_filename = str(uuid.uuid4()) + "." + "png"
+            save_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+            model = st.selectbox(label="Select Model", options= ['Select','Document_AI','Anthropic','OpenAI'])
 
-    # Save the image in PNG format
-        jpeg_image.save(save_path)
-        # with open(save_path, "wb") as f:
-        #    f.write(uploaded_file.getbuffer())
-        col1, col2 = st.columns([1,1])  
-        with col1:
-            st.image(save_path, caption="Uploaded Image", use_column_width=True)
+            jpeg_image = Image.open(uploaded_file)
 
-        with col2:
-                
+        # Save the image in PNG format
+            jpeg_image.save(save_path)
+            # with open(save_path, "wb") as f:
+            #    f.write(uploaded_file.getbuffer())
+            col1, col2 = st.columns([1,1])  
+            with col1:
+                st.image(save_path, caption="Uploaded Image", use_column_width=True)
 
-            if model == 'Select':
-                ""
-            elif model == "Document_AI":
-                result,confidence = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
-                st.write("Document AI, (By Google).")
-                st.write("-"*80)
-                
-                st.write(f"Confidence : {confidence:.2f} %")
+            with col2:
+                    
 
-                st.write("-"*80)
+                if model == 'Select':
+                    ""
+                elif model == "Document_AI":
+                    result,confidence = ocr_doc(PROJECT_ID,LOCATION,PROCESSOR_ID,save_path,credentials)
+                    st.write("Document AI, (By Google).")
+                    st.write("-"*80)
+                    
+                    st.write(f"Confidence : {confidence:.2f} %")
 
-                st.write(result)
+                    st.write("-"*80)
 
-            elif model == 'Anthropic':
-                    antropic_model_name = st.selectbox(label='Select Anthropic model',options=['claude-3-5-sonnet-20240620','claude-3-opus-20240229'])
+                    st.write(result)
 
-                    promt_txt = st.text_input(label="Default Prompt : Transcribe this text. Only output the text and nothing else.",
-                                              value="",
-                                              placeholder="Please write custom prompt here.")
-                    if promt_txt:
-                        
-                        basestring = get_base64_encoded_image(save_path)
-                        result, total_tokanes = ocr_anthropic(image_strin=basestring,api_key=ANTHROPIC_API_KEY,prompt=promt_txt,MODEL_NAME=antropic_model_name)
+                elif model == 'Anthropic':
+                        antropic_model_name = st.selectbox(label='Select Anthropic model',options=['claude-3-5-sonnet-20240620','claude-3-opus-20240229'])
+
+                        promt_txt = st.text_input(label="Default Prompt : Transcribe this text. Only output the text and nothing else.",
+                                                value="",
+                                                placeholder="Please write custom prompt here.")
+                        if promt_txt:
+                            
+                            basestring = get_base64_encoded_image(save_path)
+                            result, total_tokanes = ocr_anthropic(image_strin=basestring,api_key=ANTHROPIC_API_KEY,prompt=promt_txt,MODEL_NAME=antropic_model_name)
+                            st.write("-"*80)
+                            st.write(f"Total tokens : {total_tokanes}")
+                            st.write("-"*80)                       
+                            st.write(result)
+
+                elif model == 'OpenAI':
+                    antropic_model_name = st.selectbox(label='Select OpenAI model',options=['gpt-4o','gpt-4o-mini','o1-preview','gpt-4-turbo'])
+                    promt_txt_openai = st.text_input(label="Default Prompt : Transcribe this text. Only output the text and nothing else.",
+                                                value="",
+                                                placeholder="Please write custom prompt here.")
+                    if promt_txt_openai:
+
+                        base64_img = f"data:image/png;base64,{encode_image(save_path)}"  
+                        result,ttl_tokaen = openai_ocr(base64_img=base64_img,api_key=OPEN_AI_KEY)      
                         st.write("-"*80)
-                        st.write(f"Total tokens : {total_tokanes}")
+                        st.write(f"Total tokens : {ttl_tokaen}")
                         st.write("-"*80)                       
                         st.write(result)
 
-            elif model == 'OpenAI':
-                promt_txt_openai = st.text_input(label="Default Prompt : Transcribe this text. Only output the text and nothing else.",
-                                              value="",
-                                              placeholder="Please write custom prompt here.")
-                if promt_txt_openai:
-
-                    base64_img = f"data:image/png;base64,{encode_image(save_path)}"  
-                    result,ttl_tokaen = openai_ocr(base64_img=base64_img,api_key=OPEN_AI_KEY)      
-                    st.write("-"*80)
-                    st.write(f"Total tokens : {ttl_tokaen}")
-                    st.write("-"*80)                       
-                    st.write(result)
+        else:
+            st.warning('File size exceeds the 5 MB limit. Please upload a smaller file.')                
                     
       
     if st.button("Logout"):
